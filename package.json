@@ -5,9 +5,17 @@
     "build": "next build",
     "start": "next start",
     "test": "jest --watch",
-    "test:ci": "jest --ci"
+    "test:ci": "jest --ci",
+    "e2e": "cypress open"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.3",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.5",
+    "@supabase/supabase-js": "^2.24.0",
+    "cypress": "^12.14.0",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
