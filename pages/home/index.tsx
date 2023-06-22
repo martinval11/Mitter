@@ -16,7 +16,7 @@ import {
 import { red } from '@mui/material/colors';
 import { MoreVert, Favorite, Share } from '@mui/icons-material';
 
-import { supabase } from 'lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 import { SearchBox } from '@/components/SearchBox/SearchBox';
 
 import Head from 'next/head';

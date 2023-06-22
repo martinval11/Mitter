@@ -1,29 +1,18 @@
-# Next.js + Jest
+# Mitter
+An attempt of social networking.
 
-This example shows how to configure Jest to work with Next.js.
+**Warning:** This project is experimental and unstable.
 
-This includes Next.js' built-in support for Global CSS, CSS Modules and TypeScript.
+## Setup
+You need <a href="https://git-scm.com/" target="_blank" rel="noopener noreferrer">git</a> and <a href="https://pnpm.io/" target="_blank" rel="noopener noreferrer">pnpm</a> installed on your computer.
 
-## How to Use
-
-Quickly get started using [Create Next App](https://github.com/vercel/next.js/tree/canary/packages/create-next-app#readme)!
-
-In your terminal, run the following command:
-
-```bash
-npx create-next-app --example with-jest with-jest-app
+```shell
+$ git clone https://github.com/martinval11/Mitter
+$ cd Mitter
+$ pnpm install
 ```
 
-```bash
-yarn create next-app --example with-jest with-jest-app
-```
-
-```bash
-pnpm create next-app --example with-jest with-jest-app
-```
-
-## Run Jest Tests
-
-```bash
-npm test
-```
+## Scripts
+* `pnpm dev` - Executes a dev environment.
+* `pnpm build` - Make a build for production.
+* `pnpm test` - Executes jest and testing library for test the components.
