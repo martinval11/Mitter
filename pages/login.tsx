@@ -25,7 +25,9 @@ import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { theme } from '../lib/theme';
-import { supabase } from 'lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
+import { decrypt } from '../lib/security/decrypt';
+
 import Error from '@/components/Error/Error';
 
 const Login = () => {
@@ -55,7 +57,7 @@ const Login = () => {
     event.preventDefault();
     const { data: users, error } = await supabase
       .from('users')
-      .select('name, password');
+      .select('name, password')
 
     if (error) {
       setError(true);
@@ -65,7 +67,7 @@ const Login = () => {
     const searchUser = users!.find(
       (user: any) =>
         user.name === userRef.current?.value &&
-        user.password === passRef.current?.value
+        decrypt(user.password).message === passRef.current?.value
     );
 
     if (searchUser) {

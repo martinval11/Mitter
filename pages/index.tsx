@@ -14,11 +14,12 @@ import {
 import Head from 'next/head';
 
 import { theme } from '../lib/theme';
-import { supabase } from 'lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import Error from '@/components/Error/Error';
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { encrypt } from '../lib/security/encrypt';
 
 const Index = () => {
   const [checked, setChecked] = useState(true);
@@ -49,7 +50,7 @@ const Index = () => {
       {
         name: userRef.current?.value,
         email: emailRef.current?.value,
-        password: passRef.current?.value,
+        password: encrypt(passRef.current?.value),
       },
     ]);
 
