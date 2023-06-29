@@ -16,21 +16,22 @@ import {
 import { red } from '@mui/material/colors';
 import { MoreVert, Favorite, Share } from '@mui/icons-material';
 
-import { supabase } from '../../lib/supabaseClient';
-import { SearchBox } from '@/components/SearchBox/SearchBox';
-
 import Head from 'next/head';
 import NextLink from 'next/link';
 
+import { SearchBox } from '@/components/SearchBox/SearchBox';
 import Nav from '@/components/Nav/Nav';
+
+import { supabase } from '@/lib/supabaseClient';
+
 import { useState, useRef, useEffect, forwardRef } from 'react';
 
 const Home = ({ posts }: any) => {
-  const [data, setData] = useState(posts);
+  const [, setData] = useState(posts);
   const postContentRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState(false);
 
-  const LinkBehaviour = forwardRef(function LinkBehaviour(
+  const LinkBehaviour: any = forwardRef(function LinkBehaviour(
     props: any,
     ref: any
   ) {
@@ -55,23 +56,17 @@ const Home = ({ posts }: any) => {
     },
   });
 
-  useEffect(() => {
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'true') {
-      setChecked(true);
-    }
-  }, []);
-
   const renderUpdatedData = async () => {
     const { data } = await supabase
       .from('posts')
-      .select('author, content, likes, rePost, postNumber');
+      .select('author, content, likes, rePost');
 
     setData(data);
-  }
+  };
 
   const publish = async (event: any) => {
     event.preventDefault();
+
     const user = localStorage.getItem('username');
 
     const { error }: any = await supabase.from('posts').insert({
@@ -79,49 +74,55 @@ const Home = ({ posts }: any) => {
       content: postContentRef.current?.value,
       likes: 0,
       rePost: 0,
-      postNumber: data.length + 1,
     });
 
-    if (error) {
-      console.log(error);
-    } else {
-      renderUpdatedData();
+    {
+      error ? console.error(error) : renderUpdatedData();
     }
   };
 
   const likePost = async (likes: number, postId: number) => {
-    const likeValue: any = document.getElementById(`like${postId}`); // TODO: this is insane, please change this...
+    const likeValue: any = document.getElementById(`like${postId}`);
 
     if (likeValue.className === 'incremented') {
-      const { error }: any = await supabase
+      const { error } = await supabase
         .from('posts')
         .update({ likes: likes - 1 })
         .eq('id', postId);
 
-      if (error) {
-        console.log(error);
+      {
+        error ? console.error(error) : null;
       }
 
       likeValue!.innerHTML = likes;
       likeValue.classList.remove('incremented');
-    } else {
-      const { error }: any = await supabase
-        .from('posts')
-        .update({ likes: likes + 1 })
-        .eq('id', postId);
-
-      if (error) {
-        console.log(error);
-      }
-
-      likeValue!.innerHTML = likes + 1;
-      likeValue.classList.add('incremented');
+      return;
     }
+
+    const { error } = await supabase
+      .from('posts')
+      .update({ likes: likes + 1 })
+      .eq('id', postId);
+
+    {
+      error ? console.error(error) : null;
+    }
+
+    likeValue!.innerHTML = likes + 1;
+    likeValue.classList.add('incremented');
   };
 
   const rePost = () => {
     console.log('Re Post');
   };
+
+  useEffect(() => {
+    const darkMode = localStorage.getItem('darkMode');
+
+    if (darkMode === 'true') {
+      setChecked(true);
+    }
+  }, []);
 
   return (
     <>
@@ -172,22 +173,19 @@ const Home = ({ posts }: any) => {
                 <CardHeader
                   avatar={
                     <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                      R
+                      {post.author.charAt(0).toUpperCase()}
                     </Avatar>
-                  }
-                  action={
-                    <IconButton aria-label="settings">
-                      <MoreVert />
-                    </IconButton>
                   }
                   title={post.author}
                   subheader={post.created_at}
                 />
+
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
                     {post.content}
                   </Typography>
                 </CardContent>
+
                 <CardActions disableSpacing>
                   <IconButton
                     aria-label="add to favorites"

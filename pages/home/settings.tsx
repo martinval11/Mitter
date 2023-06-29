@@ -14,15 +14,16 @@ import {
   Button,
 } from '@mui/material';
 
-import { forwardRef } from 'react';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
-import { supabase } from 'lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
+import { decrypt } from '@/lib/security/decrypt';
+
+import { useState, useEffect, useRef, forwardRef } from 'react';
+
 import Nav from '@/components/Nav/Nav';
-
-import { useState, useEffect, useRef } from 'react';
 
 const Settings = () => {
   const [checked, setChecked] = useState(false);
@@ -41,40 +42,44 @@ const Settings = () => {
 
   const deleteAccount = async (event: any) => {
     event.preventDefault();
+
     const getUser = localStorage.getItem('username');
 
     const { data: users, error } = await supabase
       .from('users')
-      .select('id, name, password')
+      .select('id, name, password');
 
     if (error) {
       alert('Error deleting account');
       return;
     }
-    
+
     const searchUser = users!.find(
       (user: any) =>
         user.name === getUser &&
-        user.password === passwordDelAccountRef.current?.value
+        decrypt(user.password) === passwordDelAccountRef.current?.value
     );
 
     if (searchUser) {
-      const { error: deleteUser } = await supabase
+      const { error } = await supabase
         .from('users')
         .delete()
         .eq('id', searchUser.id);
-    
-      if (deleteUser) {
-        localStorage.removeItem('username');
-        localStorage.removeItem('saveSession');
-        localStorage.removeItem('saveSession');
-        router.push('/');
-      } else {
-        alert('Error deleting account');
+
+      if (error) {
+        console.error(error);
+        return;
       }
-    } else {
-      alert('Error searching your user');
+
+      localStorage.removeItem('username');
+      localStorage.removeItem('saveSession');
+      localStorage.removeItem('saveSession');
+
+      router.push('/');
+      return;
     }
+
+    alert('Error searching your user');
   };
 
   let instantChecked = false; // This is for prevent useState delay, fuck useState >.<
@@ -106,13 +111,13 @@ const Settings = () => {
 
   const handleCheckDarkMode = () => {
     instantChecked = !checked;
-    console.log(instantChecked);
     setChecked(!checked);
     localStorage.setItem('darkMode', instantChecked.toString());
   };
 
   useEffect(() => {
     const darkMode = localStorage.getItem('darkMode');
+
     if (darkMode === 'true') {
       setChecked(true);
     }
@@ -148,8 +153,10 @@ const Settings = () => {
           <Button variant="outlined" onClick={openDelAccountDialog}>
             Delete Account
           </Button>
+
           <Dialog open={openDelAccountModal} onClose={closeDelAccountDialog}>
             <DialogTitle>Delete your account</DialogTitle>
+
             <form onSubmit={deleteAccount}>
               <DialogContent>
                 <TextField
@@ -163,6 +170,7 @@ const Settings = () => {
                   required
                 />
               </DialogContent>
+              
               <DialogActions>
                 <Button onClick={closeDelAccountDialog}>Cancel</Button>
                 <Button type="submit">Delete account</Button>
