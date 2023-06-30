@@ -19,17 +19,18 @@ import { Favorite, Share } from '@mui/icons-material';
 import Head from 'next/head';
 import NextLink from 'next/link';
 
-import { SearchBox } from '@/components/SearchBox/SearchBox';
-import Nav from '@/components/Nav/Nav';
+import { useState, forwardRef, useRef, useEffect } from 'react';
 
 import { supabase } from '@/lib/supabaseClient';
 
-import { useState, useRef, useEffect, forwardRef } from 'react';
+import Nav from '@/components/Nav/Nav';
+import { SearchBox } from '@/components/SearchBox/SearchBox';
 
-const Home = ({ posts }: any) => {
-  const [, setData] = useState(posts);
-  const postContentRef = useRef<HTMLInputElement>(null);
+const Explore = () => {
+  const [posts, setPosts]: any = useState([]);
   const [checked, setChecked] = useState(false);
+
+  const searchPostRef: any = useRef<HTMLInputElement>(null);
 
   const LinkBehaviour: any = forwardRef(function LinkBehaviour(
     props: any,
@@ -56,29 +57,20 @@ const Home = ({ posts }: any) => {
     },
   });
 
-  const renderUpdatedData = async () => {
-    const { data } = await supabase
-      .from('posts')
-      .select('author, content, likes, rePost');
-
-    setData(data);
-  };
-
-  const publish = async (event: any) => {
+  const searchPost = async (event: any) => {
     event.preventDefault();
 
-    const user = localStorage.getItem('username');
+    const { data } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('content', searchPostRef.current.value);
 
-    const { error }: any = await supabase.from('posts').insert({
-      author: user,
-      content: postContentRef.current?.value,
-      likes: 0,
-      rePost: 0,
-    });
-
-    {
-      error ? console.error(error) : renderUpdatedData();
+    if (data?.length === 0) {
+      alert('No post found');
+      return;
     }
+
+    setPosts(data);
   };
 
   const likePost = async (likes: number, postId: number) => {
@@ -138,7 +130,7 @@ const Home = ({ posts }: any) => {
         <Nav />
 
         <Container maxWidth="md">
-          <form onSubmit={publish}>
+          <form onSubmit={searchPost}>
             <Box
               sx={{
                 display: 'flex',
@@ -149,8 +141,8 @@ const Home = ({ posts }: any) => {
             >
               <SearchBox
                 variant="outlined"
-                label="What is happening?!"
-                inputRef={postContentRef}
+                label="Search content here"
+                inputRef={searchPostRef}
                 sx={{ borderRadius: '4px 0 0 4px' }}
                 required
                 fullWidth
@@ -160,14 +152,12 @@ const Home = ({ posts }: any) => {
                 variant="contained"
                 sx={{ borderRadius: '0 4px 4px 0' }}
               >
-                Publish
+                Search
               </Button>
             </Box>
           </form>
 
           <Box>
-            <Typography variant="h6">Recent Posts</Typography>
-
             {posts.map((post: any, index: number) => (
               <Card key={index} sx={{ mt: 1, mb: 1 }}>
                 <CardHeader
@@ -177,7 +167,6 @@ const Home = ({ posts }: any) => {
                     </Avatar>
                   }
                   title={post.author}
-                  subheader={post.created_at}
                 />
 
                 <CardContent>
@@ -207,16 +196,4 @@ const Home = ({ posts }: any) => {
   );
 };
 
-export const getServerSideProps = async () => {
-  const { data } = await supabase
-    .from('posts')
-    .select('id, author, content, likes, rePost');
-
-  return {
-    props: {
-      posts: data,
-    },
-  };
-};
-
-export default Home;
+export default Explore;
