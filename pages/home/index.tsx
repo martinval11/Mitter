@@ -74,6 +74,7 @@ const Home = ({ posts }: any) => {
       content: postContentRef.current?.value,
       likes: 0,
       rePost: 0,
+      comments: { allComments: [] },
     });
 
     {
