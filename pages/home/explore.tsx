@@ -12,11 +12,13 @@ import {
   Avatar,
   IconButton,
   createTheme,
+  LinearProgress,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { Favorite, Share } from '@mui/icons-material';
+import { Favorite, Share, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
+import Image from 'next/image';
 import NextLink from 'next/link';
 
 import { useState, forwardRef, useRef, useEffect } from 'react';
@@ -28,6 +30,9 @@ import { SearchBox } from '@/components/SearchBox/SearchBox';
 
 const Explore = () => {
   const [posts, setPosts]: any = useState([]);
+  const [searching, setSearching]: any = useState(false);
+  const [resultsNotFound, setResultsNotFound]: any = useState(false);
+
   const [checked, setChecked] = useState(false);
 
   const searchPostRef: any = useRef<HTMLInputElement>(null);
@@ -60,17 +65,22 @@ const Explore = () => {
   const searchPost = async (event: any) => {
     event.preventDefault();
 
+    setPosts([]);
+    setSearching(true);
+
     const { data } = await supabase
       .from('posts')
       .select('*')
       .eq('content', searchPostRef.current.value);
 
     if (data?.length === 0) {
-      alert('No post found');
+      setResultsNotFound(true);
+      setSearching(false);
       return;
     }
 
     setPosts(data);
+    setSearching(false);
   };
 
   const likePost = async (likes: number, postId: number) => {
@@ -104,6 +114,10 @@ const Explore = () => {
     likeValue.classList.add('incremented');
   };
 
+  const commentPost = () => {
+    console.log('Comment post');
+  };
+
   const rePost = () => {
     console.log('Re Post');
   };
@@ -119,7 +133,7 @@ const Explore = () => {
   return (
     <>
       <Head>
-        <title>Home / Mitter</title>
+        <title>Explore / Mitter</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="" />
       </Head>
@@ -167,6 +181,10 @@ const Explore = () => {
                     </Avatar>
                   }
                   title={post.author}
+                  subheader={post.created_at
+                    .split('.')[0]
+                    .replace('T', ' ')
+                    .substring(0, 16)}
                 />
 
                 <CardContent>
@@ -180,15 +198,43 @@ const Explore = () => {
                     aria-label="add to favorites"
                     onClick={() => likePost(post.likes, post.id)}
                   >
-                    <Favorite />{' '}
+                    <Favorite sx={{ marginRight: '3px' }} />{' '}
                     <small id={`like${post.id}`}>{post.likes}</small>
                   </IconButton>
+
+                  <IconButton aria-label="comment" onClick={commentPost}>
+                    <Comment sx={{ marginRight: '3px' }} />{' '}
+                    <small>{post.comments.allComments.length}</small>
+                  </IconButton>
+
                   <IconButton aria-label="share" onClick={rePost}>
-                    <Share /> <small>{post.rePost}</small>
+                    <Share sx={{ marginRight: '3px' }} />{' '}
+                    <small>{post.rePost}</small>
                   </IconButton>
                 </CardActions>
               </Card>
             ))}
+
+            {searching ? <LinearProgress /> : null}
+            {resultsNotFound ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  src="http://localhost:3000/img/404-error.png"
+                  alt="Error 404 image"
+                  width={250}
+                  height={250}
+                />
+                <Typography variant="h4" mt={-5}>
+                  No post found
+                </Typography>
+              </Box>
+            ) : null}
           </Box>
         </Container>
       </ThemeProvider>

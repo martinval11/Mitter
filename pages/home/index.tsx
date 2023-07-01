@@ -14,7 +14,7 @@ import {
   createTheme,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { Favorite, Share } from '@mui/icons-material';
+import { Favorite, Share, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
 import NextLink from 'next/link';
@@ -112,6 +112,10 @@ const Home = ({ posts }: any) => {
     likeValue.classList.add('incremented');
   };
 
+  const commentPost = () => {
+    console.log('Comment post');
+  };
+
   const rePost = () => {
     console.log('Re Post');
   };
@@ -177,7 +181,10 @@ const Home = ({ posts }: any) => {
                     </Avatar>
                   }
                   title={post.author}
-                  subheader={post.created_at}
+                  subheader={post.created_at
+                    .split('.')[0]
+                    .replace('T', ' ')
+                    .substring(0, 16)}
                 />
 
                 <CardContent>
@@ -194,6 +201,12 @@ const Home = ({ posts }: any) => {
                     <Favorite />{' '}
                     <small id={`like${post.id}`}>{post.likes}</small>
                   </IconButton>
+
+                  <IconButton aria-label="comment" onClick={commentPost}>
+                    <Comment sx={{ marginRight: '3px' }} />{' '}
+                    <small>{post.comments.allComments.length}</small>
+                  </IconButton>
+
                   <IconButton aria-label="share" onClick={rePost}>
                     <Share /> <small>{post.rePost}</small>
                   </IconButton>
@@ -208,9 +221,7 @@ const Home = ({ posts }: any) => {
 };
 
 export const getServerSideProps = async () => {
-  const { data } = await supabase
-    .from('posts')
-    .select('id, author, content, likes, rePost');
+  const { data } = await supabase.from('posts').select('*');
 
   return {
     props: {
