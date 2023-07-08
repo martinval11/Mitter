@@ -13,3 +13,8 @@ body {
 .incremented {
   color: #90caf9;
 }
+
+#no_colorlink {
+  text-decoration: none;
+  color: inherit;
+}

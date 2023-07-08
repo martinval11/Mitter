@@ -17,6 +17,7 @@ import { red } from '@mui/material/colors';
 import { Favorite, Share, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
+import Link from 'next/link';
 import NextLink from 'next/link';
 
 import { SearchBox } from '@/components/SearchBox/SearchBox';
@@ -59,7 +60,7 @@ const Home = ({ posts }: any) => {
   const renderUpdatedData = async () => {
     const { data } = await supabase
       .from('posts')
-      .select('author, content, likes, rePost');
+      .select('id, author, content, likes, comments, rePost');
 
     setData(data);
   };
@@ -173,46 +174,55 @@ const Home = ({ posts }: any) => {
           <Box>
             <Typography variant="h6">Recent Posts</Typography>
 
-            {posts.map((post: any, index: number) => (
-              <Card key={index} sx={{ mt: 1, mb: 1 }}>
-                <CardHeader
-                  avatar={
-                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                      {post.author.charAt(0).toUpperCase()}
-                    </Avatar>
-                  }
-                  title={post.author}
-                  subheader={post.created_at
-                    .split('.')[0]
-                    .replace('T', ' ')
-                    .substring(0, 16)}
-                />
+            {posts.map((post: any) => (
+              <Link
+                href={{
+                  pathname: '/home/post',
+                  query: { id: post.id },
+                }}
+                key={post.id}
+                id="no_colorlink"
+              >
+                <Card sx={{ mt: 1, mb: 1 }}>
+                  <CardHeader
+                    avatar={
+                      <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                        {post.author.charAt(0).toUpperCase()}
+                      </Avatar>
+                    }
+                    title={post.author}
+                    subheader={post.created_at
+                      .split('.')[0]
+                      .replace('T', ' ')
+                      .substring(0, 16)}
+                  />
 
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    {post.content}
-                  </Typography>
-                </CardContent>
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      {post.content}
+                    </Typography>
+                  </CardContent>
 
-                <CardActions disableSpacing>
-                  <IconButton
-                    aria-label="add to favorites"
-                    onClick={() => likePost(post.likes, post.id)}
-                  >
-                    <Favorite />{' '}
-                    <small id={`like${post.id}`}>{post.likes}</small>
-                  </IconButton>
+                  <CardActions disableSpacing>
+                    <IconButton
+                      aria-label="add to favorites"
+                      onClick={() => likePost(post.likes, post.id)}
+                    >
+                      <Favorite />{' '}
+                      <small id={`like${post.id}`}>{post.likes}</small>
+                    </IconButton>
 
-                  <IconButton aria-label="comment" onClick={commentPost}>
-                    <Comment sx={{ marginRight: '3px' }} />{' '}
-                    <small>{post.comments.allComments.length}</small>
-                  </IconButton>
+                    <IconButton aria-label="comment" onClick={commentPost}>
+                      <Comment sx={{ marginRight: '3px' }} />{' '}
+                      <small>{post.comments.allComments.length}</small>
+                    </IconButton>
 
-                  <IconButton aria-label="share" onClick={rePost}>
-                    <Share /> <small>{post.rePost}</small>
-                  </IconButton>
-                </CardActions>
-              </Card>
+                    <IconButton aria-label="share" onClick={rePost}>
+                      <Share /> <small>{post.rePost}</small>
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              </Link>
             ))}
           </Box>
         </Container>
@@ -223,6 +233,7 @@ const Home = ({ posts }: any) => {
 
 export const getServerSideProps = async () => {
   const { data } = await supabase.from('posts').select('*');
+  console.log(data)
 
   return {
     props: {

@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
-const Input = ({ mt, type, ...props }: any) => {
+const Input = ({ mt, type, label, ...props }: any) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show: any) => !show);
@@ -23,9 +23,7 @@ const Input = ({ mt, type, ...props }: any) => {
   if (type === 'password') {
     return (
       <FormControl variant="outlined" sx={{ mt: 2 }}>
-        <InputLabel htmlFor="outlined-adornment-password">
-          Password *
-        </InputLabel>
+        <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
 
         <OutlinedInput
           id="outlined-adornment-password"
@@ -42,8 +40,9 @@ const Input = ({ mt, type, ...props }: any) => {
               </IconButton>
             </InputAdornment>
           }
-          {...props}
+          label={...label}
           required
+          {...props}
         />
       </FormControl>
     );
@@ -52,6 +51,7 @@ const Input = ({ mt, type, ...props }: any) => {
       <TextField
         id="outlined-basic"
         variant="outlined"
+        label={label}
         autoComplete="on"
         required
         sx={{ mt: mt }}

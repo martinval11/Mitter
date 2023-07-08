@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import {
   MenuItem,
   Tooltip,
@@ -21,15 +19,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+import { useState } from 'react';
+
+import styles from './Nav.module.css';
+
 const Nav = () => {
   const router = useRouter();
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -102,15 +100,17 @@ const Nav = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              <Link href="/home">
+              <Link href="/home" className={styles.link}>
                 <MenuItem onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">Home</Typography>
                 </MenuItem>
               </Link>
 
-              <MenuItem onClick={handleCloseNavMenu}>
-                <Typography textAlign="center">Explore</Typography>
-              </MenuItem>
+              <Link href="/home/explore" className={styles.link}>
+                <MenuItem onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">Explore</Typography>
+                </MenuItem>
+              </Link>
 
               <MenuItem onClick={handleCloseNavMenu}>
                 <Typography textAlign="center">Notifications</Typography>
@@ -122,7 +122,7 @@ const Nav = () => {
             variant="h5"
             noWrap
             component="a"
-            href=""
+            href="/home"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -137,28 +137,28 @@ const Nav = () => {
             Mitter
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-
-              <Button
-                onClick={handleCloseNavMenu}
-                href="/home"
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                Home
-              </Button>
-
-              <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                Explore
-              </Button>
-              
             <Button
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                Notifications
-              </Button>
+              onClick={handleCloseNavMenu}
+              href="/home"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+              Home
+            </Button>
+
+            <Button
+              onClick={handleCloseNavMenu}
+              href="/home/explore"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+              Explore
+            </Button>
+
+            <Button
+              onClick={handleCloseNavMenu}
+              sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+              Notifications
+            </Button>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -185,15 +185,13 @@ const Nav = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">Profile</Typography>
-              </MenuItem>
+              <Link href={{ pathname: '/home/profile', query: { user: 'this way' } }} className={styles.link}>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">Profile</Typography>
+                </MenuItem>
+              </Link>
 
-              <MenuItem onClick={handleCloseUserMenu}>
-                <Typography textAlign="center">Verified</Typography>
-              </MenuItem>
-
-              <Link href="/home/settings">
+              <Link href="/home/settings" className={styles.link}>
                 <MenuItem>
                   <Typography textAlign="center">Settings</Typography>
                 </MenuItem>

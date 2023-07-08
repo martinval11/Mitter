@@ -105,7 +105,7 @@ const Index = () => {
             <Input
               mt={3}
               type="password"
-              label="Password"
+              label="Password *"
               inputRef={passRef}
               inputProps={{ minLength: 8, maxLength: 20 }}
             />
@@ -113,7 +113,7 @@ const Index = () => {
             <Input
               mt={2}
               type="password"
-              label="Confirm Password"
+              label="Confirm Password *"
               inputRef={confirmPassRef}
             />
 
