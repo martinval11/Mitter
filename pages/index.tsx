@@ -73,6 +73,7 @@ const Index = () => {
     if (session === 'true') {
       router.push('/home');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

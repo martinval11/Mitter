@@ -45,7 +45,7 @@ const Home = ({ posts }: any) => {
         defaultProps: {
           component: LinkBehaviour,
         },
-      },
+      } as any,
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehaviour,

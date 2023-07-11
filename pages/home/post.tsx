@@ -50,7 +50,7 @@ const Post = ({ post }: any) => {
         defaultProps: {
           component: LinkBehaviour,
         },
-      },
+      } as any,
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehaviour,

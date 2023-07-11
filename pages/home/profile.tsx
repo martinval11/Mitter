@@ -29,7 +29,7 @@ const Profile = ({ profile }: any) => {
         defaultProps: {
           component: LinkBehaviour,
         },
-      },
+      } as any,
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehaviour,
@@ -65,9 +65,10 @@ const Profile = ({ profile }: any) => {
         <Container maxWidth="md">
 
             <Typography variant="h4" component="h1" gutterBottom>
-              {profile}
+              {profile[0].name}
             </Typography>
 
+            Followers: {profile[0].followers}
         </Container>
       </ThemeProvider>
     </>
@@ -77,11 +78,10 @@ const Profile = ({ profile }: any) => {
 export async function getServerSideProps({ query }: any) {
   const { user } = query;
   const { data } = await supabase.from('users').select('*').eq('name', user);
-  console.log(data);
 
   return {
     props: {
-      profile: user,
+      profile: data,
     },
   };
 }

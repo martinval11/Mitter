@@ -75,6 +75,7 @@ const Login = () => {
     if (session === 'true') {
       router.push('/home');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -123,7 +124,7 @@ const Login = () => {
             </Button>
 
             <p>
-              Don't have an account? <Link href="/">Sign up</Link>
+              Don&apos;t have an account? <Link href="/">Sign up</Link>
             </p>
           </form>
         </Container>

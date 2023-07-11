@@ -50,7 +50,7 @@ const Explore = () => {
         defaultProps: {
           component: LinkBehaviour,
         },
-      },
+      } as any,
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehaviour,
