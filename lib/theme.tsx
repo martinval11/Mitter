@@ -16,15 +16,15 @@ export const theme = () => {
         defaultProps: {
           component: LinkBehaviour,
         },
-      },
+      } as any,
       MuiButtonBase: {
         defaultProps: {
           LinkComponent: LinkBehaviour,
         },
       },
-    },
+    } as any,
     palette: {
-      mode: 'dark'
-    },
+      mode: 'dark',
+    }
   });
 };
