@@ -15,9 +15,10 @@ import {
   LinearProgress,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { Favorite, Share, Comment } from '@mui/icons-material';
+import { Favorite, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
+import Link from 'next/link';
 import Image from 'next/image';
 import NextLink from 'next/link';
 
@@ -114,14 +115,6 @@ const Explore = () => {
     likeValue.classList.add('incremented');
   };
 
-  const commentPost = () => {
-    console.log('Comment post');
-  };
-
-  const rePost = () => {
-    console.log('Re Post');
-  };
-
   useEffect(() => {
     const darkMode = localStorage.getItem('darkMode');
 
@@ -173,46 +166,50 @@ const Explore = () => {
 
           <Box>
             {posts.map((post: any, index: number) => (
-              <Card key={index} sx={{ mt: 1, mb: 1 }}>
-                <CardHeader
-                  avatar={
-                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                      {post.author.charAt(0).toUpperCase()}
-                    </Avatar>
-                  }
-                  title={post.author}
-                  subheader={post.created_at
-                    .split('.')[0]
-                    .replace('T', ' ')
-                    .substring(0, 16)}
-                />
+              <Link
+                href={{
+                  pathname: '/home/post',
+                  query: { id: post.id },
+                }}
+                key={post.id}
+                id="no_colorlink"
+              >
+                <Card key={index} sx={{ mt: 1, mb: 1 }}>
+                  <CardHeader
+                    avatar={
+                      <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                        {post.author.charAt(0).toUpperCase()}
+                      </Avatar>
+                    }
+                    title={post.author}
+                    subheader={post.created_at
+                      .split('.')[0]
+                      .replace('T', ' ')
+                      .substring(0, 16)}
+                  />
 
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    {post.content}
-                  </Typography>
-                </CardContent>
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      {post.content}
+                    </Typography>
+                  </CardContent>
 
-                <CardActions disableSpacing>
-                  <IconButton
-                    aria-label="add to favorites"
-                    onClick={() => likePost(post.likes, post.id)}
-                  >
-                    <Favorite sx={{ marginRight: '3px' }} />{' '}
-                    <small id={`like${post.id}`}>{post.likes}</small>
-                  </IconButton>
+                  <CardActions disableSpacing>
+                    <IconButton
+                      aria-label="add to favorites"
+                      onClick={() => likePost(post.likes, post.id)}
+                    >
+                      <Favorite sx={{ marginRight: '3px' }} />{' '}
+                      <small id={`like${post.id}`}>{post.likes.usersLike.length}</small>
+                    </IconButton>
 
-                  <IconButton aria-label="comment" onClick={commentPost}>
-                    <Comment sx={{ marginRight: '3px' }} />{' '}
-                    <small>{post.comments.allComments.length}</small>
-                  </IconButton>
-
-                  <IconButton aria-label="share" onClick={rePost}>
-                    <Share sx={{ marginRight: '3px' }} />{' '}
-                    <small>{post.rePost}</small>
-                  </IconButton>
-                </CardActions>
-              </Card>
+                    <IconButton aria-label="comment">
+                      <Comment sx={{ marginRight: '3px' }} />{' '}
+                      <small>{post.comments.allComments.length}</small>
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              </Link>
             ))}
 
             {searching ? <LinearProgress /> : null}

@@ -111,10 +111,6 @@ const Nav = () => {
                   <Typography textAlign="center">Explore</Typography>
                 </MenuItem>
               </Link>
-
-              <MenuItem onClick={handleCloseNavMenu}>
-                <Typography textAlign="center">Notifications</Typography>
-              </MenuItem>
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -152,13 +148,6 @@ const Nav = () => {
             >
               Explore
             </Button>
-
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              Notifications
-            </Button>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -185,7 +174,18 @@ const Nav = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <Link href={{ pathname: '/home/profile', query: { user: 'this way' } }} className={styles.link}>
+              <Link
+                href={{
+                  pathname: '/home/profile',
+                  query: {
+                    user:
+                      typeof window !== 'undefined'
+                        ? window.localStorage.getItem('username')
+                        : false,
+                  },
+                }}
+                className={styles.link}
+              >
                 <MenuItem onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">Profile</Typography>
                 </MenuItem>

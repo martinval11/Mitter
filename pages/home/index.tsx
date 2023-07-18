@@ -14,7 +14,7 @@ import {
   createTheme,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { Favorite, Share, Comment } from '@mui/icons-material';
+import { Favorite, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
 import Link from 'next/link';
@@ -29,6 +29,7 @@ import { useState, useRef, useEffect, forwardRef } from 'react';
 
 const Home = ({ posts }: any) => {
   const [, setData] = useState(posts);
+  const [allLikes, setLikes]: any = useState(posts[0].likes.usersLike);
   const postContentRef = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState(false);
 
@@ -60,7 +61,7 @@ const Home = ({ posts }: any) => {
   const renderUpdatedData = async () => {
     const { data } = await supabase
       .from('posts')
-      .select('id, author, content, likes, comments, rePost');
+      .select('id, author, content, likes, comments');
 
     setData(data);
   };
@@ -73,8 +74,7 @@ const Home = ({ posts }: any) => {
     const { error }: any = await supabase.from('posts').insert({
       author: user,
       content: postContentRef.current?.value,
-      likes: 0,
-      rePost: 0,
+      likes: { usersLike: [] },
       comments: { allComments: [] },
     });
 
@@ -101,9 +101,23 @@ const Home = ({ posts }: any) => {
       return;
     }
 
+    setLikes([
+      ...allLikes,
+      {
+        username: localStorage.getItem('username'),
+      },
+    ]);
+
     const { error } = await supabase
       .from('posts')
-      .update({ likes: likes + 1 })
+      .update({
+        likes: {
+          usersLike: [
+            ...allLikes,
+            { username: localStorage.getItem('username') },
+          ],
+        },
+      })
       .eq('id', postId);
 
     {
@@ -112,14 +126,6 @@ const Home = ({ posts }: any) => {
 
     likeValue!.innerHTML = likes + 1;
     likeValue.classList.add('incremented');
-  };
-
-  const commentPost = () => {
-    console.log('Comment post');
-  };
-
-  const rePost = () => {
-    console.log('Re Post');
   };
 
   useEffect(() => {
@@ -206,19 +212,29 @@ const Home = ({ posts }: any) => {
                   <CardActions disableSpacing>
                     <IconButton
                       aria-label="add to favorites"
-                      onClick={() => likePost(post.likes, post.id)}
+                      onClick={() =>
+                        likePost(post.likes.usersLike.length, post.id)
+                      }
                     >
                       <Favorite />{' '}
-                      <small id={`like${post.id}`}>{post.likes}</small>
+                      {post.likes.usersLike.map((like: any, index: number) => (
+                        <>
+                          {like.username === 'martin' ? (
+                            <small
+                              id={`like${post.id}`}
+                              key={index}
+                              className="incremented"
+                            >
+                              {post.likes.usersLike.length - 1}
+                            </small>
+                          ) : null}
+                        </>
+                      ))}
                     </IconButton>
 
-                    <IconButton aria-label="comment" onClick={commentPost}>
+                    <IconButton aria-label="comment">
                       <Comment sx={{ marginRight: '3px' }} />{' '}
                       <small>{post.comments.allComments.length}</small>
-                    </IconButton>
-
-                    <IconButton aria-label="share" onClick={rePost}>
-                      <Share /> <small>{post.rePost}</small>
                     </IconButton>
                   </CardActions>
                 </Card>
@@ -233,7 +249,7 @@ const Home = ({ posts }: any) => {
 
 export const getServerSideProps = async () => {
   const { data } = await supabase.from('posts').select('*');
-  console.log(data)
+  console.log(data);
 
   return {
     props: {

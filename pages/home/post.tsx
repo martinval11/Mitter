@@ -141,10 +141,6 @@ const Post = ({ post }: any) => {
     likeValue.classList.add('incremented');
   };
 
-  const rePost = () => {
-    console.log('Re Post');
-  };
-
   useEffect(() => {
     const darkMode = localStorage.getItem('darkMode');
 
@@ -192,11 +188,7 @@ const Post = ({ post }: any) => {
                 aria-label="add to favorites"
                 onClick={() => likePost(posts[0].likes, posts[0].id)}
               >
-                <Favorite /> <small id={`like${posts[0].id}`}>{posts[0].likes}</small>
-              </IconButton>
-
-              <IconButton aria-label="share" onClick={rePost}>
-                <Share /> <small>{posts[0].rePost}</small>
+                <Favorite /> <small id={`like${posts[0].id}`}>{posts[0].likes.usersLike.length}</small>
               </IconButton>
             </CardActions>
           </Card>
