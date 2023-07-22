@@ -191,7 +191,7 @@ const Profile = ({ userData, postsData }: any) => {
                 sx={{ display: 'flex', alignItems: 'center', p: '5px 0 25px' }}
               >
                 <Image
-                  src="http://localhost:3000/img/search.svg"
+                  src="/img/search.svg"
                   alt="No recent posts image"
                   width={225}
                   height={225}
