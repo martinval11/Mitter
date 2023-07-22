@@ -6,13 +6,11 @@ import {
   FormControlLabel,
   Checkbox,
   Link,
-  ThemeProvider,
 } from '@mui/material';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabaseClient';
 import { encrypt } from '@/lib/security/encrypt';
 
@@ -22,9 +20,11 @@ import Input from '@/components/Input/Input';
 import styles from '@/styles/form.module.css';
 
 import { useState, useRef, useEffect } from 'react';
+import Theme from '@/components/Theme/Theme';
 
 const Index = () => {
-  const [checked, setChecked] = useState(true);
+  const [saveSessionCheck, setSaveSessionCheck] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -36,7 +36,7 @@ const Index = () => {
   const router = useRouter();
 
   const handleChange = (event: any) => {
-    setChecked(event.target.checked);
+    setSaveSessionCheck(event.target.checked);
   };
 
   const createAccount = async (event: any) => {
@@ -59,21 +59,28 @@ const Index = () => {
     if (error) {
       setError(true);
       setErrorMessage('Something went wrong');
+      setTimeout(() => {
+        setError(false)
+      }, 5000);
       return;
     }
 
     localStorage.setItem('username', userRef.current!.value);
-    localStorage.setItem('saveSession', checked.toString());
+    localStorage.setItem('saveSession', saveSessionCheck.toString());
     router.push('/home');
   };
 
   useEffect(() => {
-    const session = localStorage.getItem('saveSession');
+    const session = Boolean(localStorage.getItem('saveSession'));
+    const darkMode = Boolean(localStorage.getItem('darkMode'));
 
-    if (session === 'true') {
-      router.push('/home');
+    {
+      session ? router.push('/home') : null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    {
+      darkMode ? setDarkMode(true) : null;
+    }
   }, []);
 
   return (
@@ -84,7 +91,7 @@ const Index = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
-      <ThemeProvider theme={theme}>
+      <Theme color={darkMode}>
         <CssBaseline />
 
         <Container
@@ -121,7 +128,7 @@ const Index = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={checked}
+                  checked={saveSessionCheck}
                   onChange={handleChange}
                   inputProps={{ 'aria-label': 'controlled' }}
                 />
@@ -140,7 +147,7 @@ const Index = () => {
         </Container>
 
         {error && <Error message={errorMessage} />}
-      </ThemeProvider>
+      </Theme>
     </>
   );
 };

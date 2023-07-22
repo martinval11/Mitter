@@ -3,11 +3,9 @@ import {
   CssBaseline,
   Container,
   Button,
-  TextField,
   FormControlLabel,
   Checkbox,
   Link,
-  ThemeProvider,
 } from '@mui/material';
 
 import Head from 'next/head';
@@ -15,7 +13,6 @@ import Head from 'next/head';
 import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-import { theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabaseClient';
 import { decrypt } from '@/lib/security/decrypt';
 
@@ -23,9 +20,11 @@ import styles from '@/styles/form.module.css';
 
 import Input from '@/components/Input/Input';
 import Error from '@/components/Error/Error';
+import Theme from '@/components/Theme/Theme';
 
 const Login = () => {
-  const [checked, setChecked] = useState(true);
+  const [saveSessionCheck, setSaveSessionCheck] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -35,7 +34,7 @@ const Login = () => {
   const router = useRouter();
 
   const handleChange = (event: any) => {
-    setChecked(event.target.checked);
+    setSaveSessionCheck(event.target.checked);
   };
 
   const login = async (event: any) => {
@@ -59,7 +58,7 @@ const Login = () => {
 
     if (searchUser) {
       localStorage.setItem('username', userRef.current?.value);
-      localStorage.setItem('saveSession', checked.toString());
+      localStorage.setItem('saveSession', saveSessionCheck.toString());
       
       router.push('/home');
       return;
@@ -67,15 +66,22 @@ const Login = () => {
 
     setError(true);
     setErrorMessage('Invalid username or password');
+    setTimeout(() => {
+      setError(false)
+    }, 5000);
   };
 
   useEffect(() => {
-    const session = localStorage.getItem('saveSession');
+    const session = Boolean(localStorage.getItem('saveSession'));
+    const darkMode = Boolean(localStorage.getItem('darkMode'));
 
-    if (session === 'true') {
-      router.push('/home');
+    {
+      session ? router.push('/home') : null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    {
+      darkMode ? setDarkMode(true) : null;
+    }
   }, []);
 
   return (
@@ -86,7 +92,7 @@ const Login = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
-      <ThemeProvider theme={theme}>
+      <Theme color={darkMode}>
         <CssBaseline />
 
         <Container
@@ -108,7 +114,7 @@ const Login = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={checked}
+                  checked={saveSessionCheck}
                   onChange={handleChange}
                   inputProps={{ 'aria-label': 'controlled' }}
                 />
@@ -130,7 +136,7 @@ const Login = () => {
         </Container>
 
         {error && <Error message={errorMessage} />}
-      </ThemeProvider>
+      </Theme>
     </>
   );
 };
