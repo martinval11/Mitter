@@ -1,5 +1,5 @@
 # Mitter
-An attempt of social networking.
+A Social Media without tracking
 
 **Warning:** This project is experimental and unstable.
 

@@ -45,7 +45,7 @@ const Index = () => {
         <Container maxWidth="md">
           <Typography
             variant="h1"
-            sx={{ fontSize: '3.75rem', mt: 4, mb: 5, textAlign: 'center' }}
+            sx={{ fontSize: '3rem', mt: 4, mb: 5, textAlign: 'center', textWrap: 'balance' }}
           >
             A Social Media without tracking
           </Typography>
@@ -53,7 +53,7 @@ const Index = () => {
           <Grid
             container
             spacing={{ xs: 2, md: 3 }}
-            columns={{ xs: 4, sm: 8, md: 12 }}
+            columns={{ xs: 2, sm: 8, md: 12 }}
           >
             <Grid item xs={2} sm={4} md={4}>
               <Card
@@ -124,7 +124,7 @@ const Index = () => {
           </Box>
 
           <Box sx={{ textAlign: 'center', mb: 5 }}>
-            <Typography variant="h3" sx={{ mt: 6, mb: 4, fontWeight: 300 }}>
+            <Typography variant="h4" sx={{ mt: 6, mb: 4, fontWeight: 300 }}>
               Ready to get started?
             </Typography>
 
