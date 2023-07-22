@@ -25,10 +25,9 @@ import Theme from '@/components/Theme/Theme';
 import { supabase } from '@/lib/supabaseClient';
 import updateToDB from '@/lib/dbTools/updateToDB';
 
-
 const Post = ({ post }: any) => {
   const [comments, setComments] = useState(post.comments.allComments);
-  const [checked, setChecked] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   const router = useRouter();
   const postId = Number(router.query.id);
@@ -57,19 +56,24 @@ const Post = ({ post }: any) => {
       },
     ]);
 
-    updateToDB('posts', {
-      comments: {
-        allComments: [
-          ...comments,
-          {
-            id: comments.length + 1,
-            content: publishCommentRef.current?.value,
-            created_at: `${dateFormat.year}-${dateFormat.month}-${dateFormat.day} ${dateFormat.hour}:${dateFormat.minute}`,
-            author: user,
-          },
-        ],
+    updateToDB(
+      'posts',
+      {
+        comments: {
+          allComments: [
+            ...comments,
+            {
+              id: comments.length + 1,
+              content: publishCommentRef.current?.value,
+              created_at: `${dateFormat.year}-${dateFormat.month}-${dateFormat.day} ${dateFormat.hour}:${dateFormat.minute}`,
+              author: user,
+            },
+          ],
+        },
       },
-    }, postId, null);
+      postId,
+      null
+    );
 
     publishCommentRef.current!.value = '';
   };
@@ -95,10 +99,18 @@ const Post = ({ post }: any) => {
   };
 
   useEffect(() => {
-    const darkMode = Boolean(localStorage.getItem('darkMode'));
+    const session = localStorage.getItem('saveSession');
+    const darkMode = localStorage.getItem('darkMode');
 
-    {
-      darkMode ? setChecked(true) : null;
+    if (darkMode === 'true') {
+      setDarkMode(true);
+      return;
+    }
+    setDarkMode(false);
+
+    if (session === 'false' || !session) {
+      router.push('/');
+      return;
     }
   }, []);
 
@@ -110,7 +122,7 @@ const Post = ({ post }: any) => {
         <meta name="description" content="" />
       </Head>
 
-      <Theme color={checked}>
+      <Theme color={darkMode}>
         <CssBaseline />
         <Nav />
 
@@ -145,7 +157,7 @@ const Post = ({ post }: any) => {
               </IconButton>
 
               <IconButton aria-label="comment">
-                <Comment sx={{ marginRight: '3px' }}  />
+                <Comment sx={{ marginRight: '3px' }} />
                 <small>{post.comments.allComments.length}</small>
               </IconButton>
             </CardActions>

@@ -28,14 +28,15 @@ import { SearchBox } from '@/components/SearchBox/SearchBox';
 
 import updateToDB from '@/lib/dbTools/updateToDB';
 import getDBData from '@/lib/dbTools/getDBData';
+import { useRouter } from 'next/router';
 
 const Explore = () => {
   const [posts, setPosts]: any = useState([]);
   const [searching, setSearching]: any = useState(false);
   const [resultsNotFound, setResultsNotFound]: any = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-
   const searchPostRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const searchPost = async (event: FormEvent) => {
     event.preventDefault();
@@ -80,10 +81,18 @@ const Explore = () => {
   };
 
   useEffect(() => {
-    const darkMode = Boolean(localStorage.getItem('darkMode'));
+    const session = localStorage.getItem('saveSession');
+    const darkMode = localStorage.getItem('darkMode');
 
-    {
-      darkMode ? setDarkMode(true) : null;
+		if (darkMode === 'true') {
+      setDarkMode(true);
+      return;
+    }
+    setDarkMode(false);
+		
+    if (session === 'false' || !session) {
+      router.push('/');
+      return;
     }
   }, []);
 
@@ -194,10 +203,10 @@ const Explore = () => {
               }}
             >
               <Image
-                src="http://localhost:3000/img/404-error.png"
+                src="http://localhost:3000/img/not-found.svg"
                 alt="Error 404 image"
-                width={250}
-                height={250}
+                width={400}
+                height={400}
               />
               <Typography variant="h4" mt={-5}>
                 No post found

@@ -6,8 +6,8 @@ const updateToDB = async (
   id: number,
   fn: Promise<void> | null
 ) => {
-  const { error } = await supabase.from(table).update(content).eq('id', id);
-
+  const { data, error } = await supabase.from(table).update(content).eq('id', id);
+  console.log(data)
   {
     error ? console.error(error) : fn;
   }

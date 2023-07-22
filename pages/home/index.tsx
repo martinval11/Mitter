@@ -16,6 +16,7 @@ import { Favorite, Comment } from '@mui/icons-material';
 
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState, useRef, useEffect, FormEvent } from 'react';
 
 import { SearchBox } from '@/components/SearchBox/SearchBox';
@@ -31,6 +32,7 @@ const Home = ({ posts }: any) => {
   const [data, setData] = useState(posts);
   const [darkMode, setDarkMode] = useState(false);
   const postContentRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const renderUpdatedData = async () => {
     const { data } = await supabase.from('posts').select('*');
@@ -74,10 +76,18 @@ const Home = ({ posts }: any) => {
   };
 
   useEffect(() => {
-    const darkMode = Boolean(localStorage.getItem('darkMode'));
+    const session = localStorage.getItem('saveSession');
+    const darkMode = localStorage.getItem('darkMode');
 
-    {
-      darkMode ? setDarkMode(true) : null;
+		if (darkMode === 'true') {
+      setDarkMode(true);
+      return;
+    }
+    setDarkMode(false);
+		
+    if (session === 'false' || !session) {
+      router.push('/');
+      return;
     }
   }, []);
 

@@ -85,10 +85,18 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    const darkMode = Boolean(localStorage.getItem('darkMode'));
+    const session = localStorage.getItem('saveSession');
+    const darkMode = localStorage.getItem('darkMode');
 
-    {
-      darkMode ? setDarkMode(true) : null;
+		if (darkMode === 'true') {
+      setDarkMode(true);
+      return;
+    }
+    setDarkMode(false);
+		
+    if (session === 'false' || !session) {
+      router.push('/');
+      return;
     }
   }, []);
 
