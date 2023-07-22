@@ -75,8 +75,12 @@ const Login = () => {
   useEffect(() => {
     const session = localStorage.getItem('saveSession');
     const darkMode = localStorage.getItem('darkMode');
+    const prefersDarkColorScheme = () =>
+      window &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    if (darkMode === 'true') {
+    if (darkMode === 'true' || prefersDarkColorScheme()) {
       setDarkMode(true);
     } else {
       setDarkMode(false);

@@ -56,26 +56,40 @@ const Profile = ({ userData, postsData }: any) => {
   };
 
   const followUser = async () => {
-    console.log(userData[0].followers, userData[0].id, userData)
+    console.log(userData[0].followers, userData[0].id, userData);
     if (follow === 'Following') {
-      updateToDB('users', { followers: userData[0].followers + 1 - 1 }, userData[0].id, null);
+      updateToDB(
+        'users',
+        { followers: userData[0].followers + 1 - 1 },
+        userData[0].id,
+        null
+      );
       setFollow('Follow');
-      return
-    }
-    updateToDB('users', { followers: userData[0].followers + 1 }, userData[0].id, null);
-    setFollow('Following');
-  }
-
-  useEffect(() => {
-    setUsername(localStorage.getItem('username'))
-    const session = localStorage.getItem('saveSession');
-    const darkMode = localStorage.getItem('darkMode');
-
-    if (darkMode === 'true') {
-      setDarkMode(true);
       return;
     }
-    setDarkMode(false);
+    updateToDB(
+      'users',
+      { followers: userData[0].followers + 1 },
+      userData[0].id,
+      null
+    );
+    setFollow('Following');
+  };
+
+  useEffect(() => {
+    setUsername(localStorage.getItem('username'));
+    const session = localStorage.getItem('saveSession');
+    const darkMode = localStorage.getItem('darkMode');
+    const prefersDarkColorScheme = () =>
+      window &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (darkMode === 'true' || prefersDarkColorScheme()) {
+      setDarkMode(true);
+    } else {
+      setDarkMode(false);
+    }
 
     if (session === 'false' || !session) {
       router.push('/');
@@ -120,7 +134,9 @@ const Profile = ({ userData, postsData }: any) => {
               </div>
               {userData[0].name !== username ? (
                 <div>
-                  <Button variant="contained" onClick={followUser}>{follow}</Button>
+                  <Button variant="contained" onClick={followUser}>
+                    {follow}
+                  </Button>
                 </div>
               ) : null}
             </Container>

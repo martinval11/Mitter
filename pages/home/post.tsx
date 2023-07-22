@@ -101,12 +101,16 @@ const Post = ({ post }: any) => {
   useEffect(() => {
     const session = localStorage.getItem('saveSession');
     const darkMode = localStorage.getItem('darkMode');
+    const prefersDarkColorScheme = () =>
+      window &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    if (darkMode === 'true') {
+    if (darkMode === 'true' || prefersDarkColorScheme()) {
       setDarkMode(true);
-      return;
+    } else {
+      setDarkMode(false);
     }
-    setDarkMode(false);
 
     if (session === 'false' || !session) {
       router.push('/');

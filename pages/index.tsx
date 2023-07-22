@@ -22,12 +22,16 @@ const Index = () => {
 
   useEffect(() => {
     const darkMode = localStorage.getItem('darkMode');
+    const prefersDarkColorScheme = () =>
+      window &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    if (darkMode === 'true') {
-      setDarkMode(true)
-      return
+    if (darkMode === 'true' || prefersDarkColorScheme()) {
+      setDarkMode(true);
+      return;
     }
-    setDarkMode(false)
+    setDarkMode(false);
   }, []);
 
   return (
@@ -45,7 +49,13 @@ const Index = () => {
         <Container maxWidth="md">
           <Typography
             variant="h1"
-            sx={{ fontSize: '3rem', mt: 4, mb: 5, textAlign: 'center', textWrap: 'balance' }}
+            sx={{
+              fontSize: '3rem',
+              mt: 4,
+              mb: 5,
+              textAlign: 'center',
+              textWrap: 'balance',
+            }}
           >
             A Social Media without tracking
           </Typography>
@@ -115,11 +125,23 @@ const Index = () => {
             </Grid>
           </Grid>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }} id="flexColumn">
-            <Image src="/img/safe.svg" alt="Safe SVG Image" width={350} height={350} />
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', gap: 4 }}
+            id="flexColumn"
+          >
+            <Image
+              src="/img/safe.svg"
+              alt="Safe SVG Image"
+              width={350}
+              height={350}
+            />
             <div>
-              <Typography variant="h5">Your information is <b>yours</b></Typography>
-              <p>We do <b>not</b> collect any personal information.</p>
+              <Typography variant="h5">
+                Your information is <b>yours</b>
+              </Typography>
+              <p>
+                We do <b>not</b> collect any personal information.
+              </p>
             </div>
           </Box>
 
