@@ -77,13 +77,12 @@ const SignUp = () => {
 
     if (darkMode === 'true') {
       setDarkMode(true);
-      return;
+    } else {
+      setDarkMode(false);
     }
-    setDarkMode(false);
 
     if (session === 'true') {
       router.push('/home');
-      return;
     }
   }, []);
 
