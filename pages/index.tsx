@@ -116,7 +116,7 @@ const Index = () => {
           </Grid>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Image src="http://localhost:3000/img/safe.svg" alt="Safe SVG Image" width={350} height={350} />
+            <Image src="/img/safe.svg" alt="Safe SVG Image" width={350} height={350} />
             <div>
               <Typography variant="h5">Your information is <b>yours</b></Typography>
               <p>We do <b>not</b> collect any personal information.</p>

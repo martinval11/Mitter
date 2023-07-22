@@ -203,7 +203,7 @@ const Explore = () => {
               }}
             >
               <Image
-                src="http://localhost:3000/img/not-found.svg"
+                src="/img/not-found.svg"
                 alt="Error 404 image"
                 width={400}
                 height={400}

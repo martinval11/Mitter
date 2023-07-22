@@ -98,7 +98,7 @@ const Profile = ({ userData, postsData }: any) => {
 
         <div className={styles.toTop}>
           <img
-            src="http://localhost:3000/img/profile_background.jpg"
+            src="/img/profile_background.jpg"
             alt="Profile background"
             className={styles.profileBackground}
           />
