@@ -112,7 +112,7 @@ const Post = ({ post }: any) => {
       setDarkMode(false);
     }
 
-    if (session === 'false' || !session) {
+    if (!session) {
       router.push('/');
       return;
     }

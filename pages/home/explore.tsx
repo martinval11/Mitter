@@ -94,7 +94,7 @@ const Explore = () => {
       setDarkMode(false);
     }
 
-    if (session === 'false' || !session) {
+    if (!session) {
       router.push('/');
       return;
     }
