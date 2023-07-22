@@ -11,7 +11,6 @@ import {
   CardContent,
   Avatar,
   IconButton,
-  createTheme,
   LinearProgress,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
@@ -20,59 +19,35 @@ import { Favorite, Comment } from '@mui/icons-material';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
-import NextLink from 'next/link';
 
-import { useState, forwardRef, useRef, useEffect } from 'react';
-
-import { supabase } from '@/lib/supabaseClient';
+import { useState, useRef, useEffect, FormEvent, RefObject } from 'react';
 
 import Nav from '@/components/Nav/Nav';
+import Theme from '@/components/Theme/Theme';
 import { SearchBox } from '@/components/SearchBox/SearchBox';
+
+import updateToDB from '@/lib/dbTools/updateToDB';
+import getDBData from '@/lib/dbTools/getDBData';
 
 const Explore = () => {
   const [posts, setPosts]: any = useState([]);
   const [searching, setSearching]: any = useState(false);
   const [resultsNotFound, setResultsNotFound]: any = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-  const [checked, setChecked] = useState(false);
+  const searchPostRef = useRef<HTMLInputElement>(null);
 
-  const searchPostRef: any = useRef<HTMLInputElement>(null);
-
-  const LinkBehaviour: any = forwardRef(function LinkBehaviour(
-    props: any,
-    ref: any
-  ) {
-    return <NextLink ref={ref} {...props} />;
-  });
-
-  const theme = createTheme({
-    components: {
-      MuiLink: {
-        defaultProps: {
-          component: LinkBehaviour,
-        },
-      } as any,
-      MuiButtonBase: {
-        defaultProps: {
-          LinkComponent: LinkBehaviour,
-        },
-      },
-    },
-    palette: {
-      mode: checked ? 'dark' : 'light',
-    },
-  });
-
-  const searchPost = async (event: any) => {
+  const searchPost = async (event: FormEvent) => {
     event.preventDefault();
 
     setPosts([]);
     setSearching(true);
 
-    const { data } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('content', searchPostRef.current.value);
+    const data = await getDBData(
+      'posts',
+      'content',
+      searchPostRef.current?.value
+    );
 
     if (data?.length === 0) {
       setResultsNotFound(true);
@@ -85,41 +60,30 @@ const Explore = () => {
   };
 
   const likePost = async (likes: number, postId: number) => {
-    const likeValue: any = document.getElementById(`like${postId}`);
+    const likeValue: any = document.querySelector(`.like${postId}`);
+    const heart: any = document.querySelector(`.heart${postId}`);
 
-    if (likeValue.className === 'incremented') {
-      const { error } = await supabase
-        .from('posts')
-        .update({ likes: likes - 1 })
-        .eq('id', postId);
+    if (likeValue.className === `like${postId} incremented`) {
+      updateToDB('posts', { likes: likes - 1 }, postId, null);
 
-      {
-        error ? console.error(error) : null;
-      }
-
-      likeValue!.innerHTML = likes;
+      likeValue.innerHTML = likes;
       likeValue.classList.remove('incremented');
+      heart.classList.remove('incremented');
       return;
     }
 
-    const { error } = await supabase
-      .from('posts')
-      .update({ likes: likes + 1 })
-      .eq('id', postId);
-
-    {
-      error ? console.error(error) : null;
-    }
+    updateToDB('posts', { likes: likes + 1 }, postId, null);
 
     likeValue!.innerHTML = likes + 1;
     likeValue.classList.add('incremented');
+    heart.classList.add('incremented');
   };
 
   useEffect(() => {
-    const darkMode = localStorage.getItem('darkMode');
+    const darkMode = Boolean(localStorage.getItem('darkMode'));
 
-    if (darkMode === 'true') {
-      setChecked(true);
+    {
+      darkMode ? setDarkMode(true) : null;
     }
   }, []);
 
@@ -131,7 +95,7 @@ const Explore = () => {
         <meta name="description" content="" />
       </Head>
 
-      <ThemeProvider theme={theme}>
+      <Theme color={darkMode}>
         <CssBaseline />
 
         <Nav />
@@ -164,77 +128,84 @@ const Explore = () => {
             </Box>
           </form>
 
-          <Box>
-            {posts.map((post: any, index: number) => (
+          {posts.map((post: any, index: number) => (
+            <Card sx={{ mt: 1, mb: 1 }} key={post.id}>
               <Link
                 href={{
                   pathname: '/home/post',
                   query: { id: post.id },
                 }}
-                key={post.id}
                 id="no_colorlink"
               >
-                <Card key={index} sx={{ mt: 1, mb: 1 }}>
-                  <CardHeader
-                    avatar={
-                      <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                        {post.author.charAt(0).toUpperCase()}
-                      </Avatar>
-                    }
-                    title={post.author}
-                    subheader={post.created_at
-                      .split('.')[0]
-                      .replace('T', ' ')
-                      .substring(0, 16)}
-                  />
-
-                  <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                      {post.content}
-                    </Typography>
-                  </CardContent>
-
-                  <CardActions disableSpacing>
-                    <IconButton
-                      aria-label="add to favorites"
-                      onClick={() => likePost(post.likes, post.id)}
-                    >
-                      <Favorite sx={{ marginRight: '3px' }} />{' '}
-                      <small id={`like${post.id}`}>{post.likes.usersLike.length}</small>
-                    </IconButton>
-
-                    <IconButton aria-label="comment">
-                      <Comment sx={{ marginRight: '3px' }} />{' '}
-                      <small>{post.comments.allComments.length}</small>
-                    </IconButton>
-                  </CardActions>
-                </Card>
-              </Link>
-            ))}
-
-            {searching ? <LinearProgress /> : null}
-            {resultsNotFound ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <Image
-                  src="http://localhost:3000/img/404-error.png"
-                  alt="Error 404 image"
-                  width={250}
-                  height={250}
+                <CardHeader
+                  avatar={
+                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                      {post.author.charAt(0).toUpperCase()}
+                    </Avatar>
+                  }
+                  title={post.author}
+                  subheader={post.created_at
+                    .split('.')[0]
+                    .replace('T', ' ')
+                    .substring(0, 16)}
                 />
-                <Typography variant="h4" mt={-5}>
-                  No post found
-                </Typography>
-              </Box>
-            ) : null}
-          </Box>
+
+                <CardContent sx={{ pb: '8px !important' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {post.content}
+                  </Typography>
+                </CardContent>
+              </Link>
+
+              <CardActions disableSpacing>
+                <IconButton
+                  aria-label="add to favorites"
+                  onClick={() => likePost(post.likes, post.id)}
+                >
+                  <Favorite className={`heart${post.id}`} />
+                  <small className={`like${post.id}`}>{post.likes}</small>
+                </IconButton>
+
+                <Link
+                  href={{
+                    pathname: '/home/post',
+                    query: { id: post.id },
+                  }}
+                  key={post.id}
+                  id="no_colorlink"
+                >
+                  <IconButton aria-label="comment">
+                    <Comment sx={{ marginRight: '3px' }} />
+                    <small>{post.comments.allComments.length}</small>
+                  </IconButton>
+                </Link>
+              </CardActions>
+            </Card>
+          ))}
+
+          {searching ? <LinearProgress /> : null}
+          
+          {resultsNotFound ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Image
+                src="http://localhost:3000/img/404-error.png"
+                alt="Error 404 image"
+                width={250}
+                height={250}
+              />
+              <Typography variant="h4" mt={-5}>
+                No post found
+              </Typography>
+            </Box>
+          ) : null}
         </Container>
-      </ThemeProvider>
+      </Theme>
     </>
   );
 };

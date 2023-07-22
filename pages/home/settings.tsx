@@ -1,11 +1,9 @@
 import {
   CssBaseline,
-  ThemeProvider,
   Container,
   Typography,
   Checkbox,
   FormControlLabel,
-  createTheme,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,33 +12,29 @@ import {
   Button,
 } from '@mui/material';
 
-import NextLink from 'next/link';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { supabase } from '@/lib/supabaseClient';
 import { decrypt } from '@/lib/security/decrypt';
 
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 
 import Nav from '@/components/Nav/Nav';
+import Theme from '@/components/Theme/Theme';
 
 const Settings = () => {
-  const [checked, setChecked] = useState(false);
-  const [openDelAccountModal, setOpenDelAccountModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [openDelAccModal, setOpenDelAccModal] = useState(false);
   const passwordDelAccountRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
-  const openDelAccountDialog = () => {
-    setOpenDelAccountModal(true);
+  const openDelAccDialog = () => {
+    setOpenDelAccModal(!openDelAccModal);
   };
 
-  const closeDelAccountDialog = () => {
-    setOpenDelAccountModal(false);
-  };
-
-  const deleteAccount = async (event: any) => {
+  const deleteAccount = async (event: FormEvent) => {
     event.preventDefault();
 
     const getUser = localStorage.getItem('username');
@@ -82,44 +76,19 @@ const Settings = () => {
     alert('Error searching your user');
   };
 
-  let instantChecked = false; // This is for prevent useState delay, fuck useState >.<
-
-  const LinkBehaviour = forwardRef(function LinkBehaviour(
-    props: any,
-    ref: any
-  ) {
-    return <NextLink ref={ref} {...props} />;
-  });
-
-  const theme = createTheme({
-    components: {
-      MuiLink: {
-        defaultProps: {
-          component: LinkBehaviour,
-        },
-      } as any,
-      MuiButtonBase: {
-        defaultProps: {
-          LinkComponent: LinkBehaviour,
-        },
-      },
-    },
-    palette: {
-      mode: checked ? 'dark' : 'light',
-    },
-  });
+  let instantChecked = false;
 
   const handleCheckDarkMode = () => {
-    instantChecked = !checked;
-    setChecked(!checked);
+    instantChecked = !darkMode;
+    setDarkMode(!darkMode);
     localStorage.setItem('darkMode', instantChecked.toString());
   };
 
   useEffect(() => {
-    const darkMode = localStorage.getItem('darkMode');
+    const darkMode = Boolean(localStorage.getItem('darkMode'));
 
-    if (darkMode === 'true') {
-      setChecked(true);
+    {
+      darkMode ? setDarkMode(true) : null;
     }
   }, []);
 
@@ -131,7 +100,7 @@ const Settings = () => {
         <meta name="description" content="" />
       </Head>
 
-      <ThemeProvider theme={theme}>
+      <Theme color={darkMode}>
         <CssBaseline />
 
         <Nav />
@@ -141,7 +110,7 @@ const Settings = () => {
 
           <FormControlLabel
             control={
-              <Checkbox checked={checked} onChange={handleCheckDarkMode} />
+              <Checkbox checked={darkMode} onChange={handleCheckDarkMode} />
             }
             label="Dark mode"
           />
@@ -150,11 +119,11 @@ const Settings = () => {
             Danger Zone
           </Typography>
 
-          <Button variant="outlined" onClick={openDelAccountDialog}>
+          <Button variant="outlined" onClick={openDelAccDialog}>
             Delete Account
           </Button>
 
-          <Dialog open={openDelAccountModal} onClose={closeDelAccountDialog}>
+          <Dialog open={openDelAccModal} onClose={openDelAccDialog}>
             <DialogTitle>Delete your account</DialogTitle>
 
             <form onSubmit={deleteAccount}>
@@ -170,15 +139,15 @@ const Settings = () => {
                   required
                 />
               </DialogContent>
-              
+
               <DialogActions>
-                <Button onClick={closeDelAccountDialog}>Cancel</Button>
+                <Button onClick={openDelAccDialog}>Cancel</Button>
                 <Button type="submit">Delete account</Button>
               </DialogActions>
             </form>
           </Dialog>
         </Container>
-      </ThemeProvider>
+      </Theme>
     </>
   );
 };

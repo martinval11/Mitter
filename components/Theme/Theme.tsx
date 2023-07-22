@@ -1,16 +1,17 @@
-import { createTheme } from '@mui/material';
-import NextLink from 'next/link';
+import { ThemeProvider, createTheme } from '@mui/material';
 import { forwardRef } from 'react';
 
-export const theme = () => {
-  const LinkBehaviour = forwardRef(function LinkBehaviour(
+import NextLink from 'next/link';
+
+const Theme = ({ color, children }: any) => {
+  const LinkBehaviour: any = forwardRef(function LinkBehaviour(
     props: any,
     ref: any
   ) {
     return <NextLink ref={ref} {...props} />;
   });
 
-  return createTheme({
+  const theme = createTheme({
     components: {
       MuiLink: {
         defaultProps: {
@@ -22,9 +23,13 @@ export const theme = () => {
           LinkComponent: LinkBehaviour,
         },
       },
-    } as any,
+    },
     palette: {
-      mode: 'dark',
-    }
+      mode: color ? 'dark' : 'light',
+    },
   });
+
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 };
+
+export default Theme;

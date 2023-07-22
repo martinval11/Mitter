@@ -1,4 +1,3 @@
-import { ThemeProvider } from '@emotion/react';
 import {
   Box,
   Container,
@@ -11,56 +10,30 @@ import {
   Avatar,
   IconButton,
   CardActions,
-  createTheme,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { Share, Favorite } from '@mui/icons-material';
+import { Comment, Favorite } from '@mui/icons-material';
 
 import Head from 'next/head';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { useState, useRef, useEffect } from 'react';
 
 import { SearchBox } from '@/components/SearchBox/SearchBox';
 import Nav from '@/components/Nav/Nav';
+import Theme from '@/components/Theme/Theme';
 
 import { supabase } from '@/lib/supabaseClient';
+import updateToDB from '@/lib/dbTools/updateToDB';
 
-import { useState, useRef, useEffect, forwardRef } from 'react';
 
 const Post = ({ post }: any) => {
-  const [comments, setComments] = useState(post[0].comments.allComments);
-  const [posts, setPosts] = useState(post);
+  const [comments, setComments] = useState(post.comments.allComments);
   const [checked, setChecked] = useState(false);
 
   const router = useRouter();
   const postId = Number(router.query.id);
 
   const publishCommentRef = useRef<HTMLInputElement>(null);
-
-  const LinkBehaviour: any = forwardRef(function LinkBehaviour(
-    props: any,
-    ref: any
-  ) {
-    return <NextLink ref={ref} {...props} />;
-  });
-
-  const theme = createTheme({
-    components: {
-      MuiLink: {
-        defaultProps: {
-          component: LinkBehaviour,
-        },
-      } as any,
-      MuiButtonBase: {
-        defaultProps: {
-          LinkComponent: LinkBehaviour,
-        },
-      },
-    },
-    palette: {
-      mode: checked ? 'dark' : 'light',
-    },
-  });
 
   const publishComment = async (event: any) => {
     event.preventDefault();
@@ -84,82 +57,61 @@ const Post = ({ post }: any) => {
       },
     ]);
 
-    const { data, error } = await supabase
-      .from('posts')
-      .update({
-        comments: {
-          allComments: [
-            ...comments,
-            {
-              id: comments.length + 1,
-              content: publishCommentRef.current?.value,
-              created_at: `${dateFormat.year}-${dateFormat.month}-${dateFormat.day} ${dateFormat.hour}:${dateFormat.minute}`,
-              author: user,
-            },
-          ],
-        },
-      })
-      .eq('id', postId)
-      .select();
+    updateToDB('posts', {
+      comments: {
+        allComments: [
+          ...comments,
+          {
+            id: comments.length + 1,
+            content: publishCommentRef.current?.value,
+            created_at: `${dateFormat.year}-${dateFormat.month}-${dateFormat.day} ${dateFormat.hour}:${dateFormat.minute}`,
+            author: user,
+          },
+        ],
+      },
+    }, postId, null);
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    setPosts(data);
+    publishCommentRef.current!.value = '';
   };
 
   const likePost = async (likes: number, postId: number) => {
-    const likeValue: any = document.getElementById(`like${postId}`);
+    const likeValue: any = document.querySelector(`.like${postId}`);
+    const heart: any = document.querySelector(`.heart${postId}`);
 
-    if (likeValue.className === 'incremented') {
-      const { error } = await supabase
-        .from('posts')
-        .update({ likes: likes - 1 })
-        .eq('id', postId);
+    if (likeValue.className === `like${postId} incremented`) {
+      updateToDB('posts', { likes: likes - 1 }, postId, null);
 
-      {
-        error ? console.error(error) : null;
-      }
-
-      likeValue!.innerHTML = likes;
+      likeValue.innerHTML = likes;
       likeValue.classList.remove('incremented');
+      heart.classList.remove('incremented');
       return;
     }
 
-    const { error } = await supabase
-      .from('posts')
-      .update({ likes: likes + 1 })
-      .eq('id', postId);
-
-    {
-      error ? console.error(error) : null;
-    }
+    updateToDB('posts', { likes: likes + 1 }, postId, null);
 
     likeValue!.innerHTML = likes + 1;
     likeValue.classList.add('incremented');
+    heart.classList.add('incremented');
   };
 
   useEffect(() => {
-    const darkMode = localStorage.getItem('darkMode');
+    const darkMode = Boolean(localStorage.getItem('darkMode'));
 
-    if (darkMode === 'true') {
-      setChecked(true);
+    {
+      darkMode ? setChecked(true) : null;
     }
   }, []);
 
   return (
     <>
       <Head>
-        <title>{posts[0].content} / Mitter</title>
+        <title>{post.content} / Mitter</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="" />
       </Head>
 
-      <ThemeProvider theme={theme}>
+      <Theme color={checked}>
         <CssBaseline />
-
         <Nav />
 
         <Container maxWidth="md">
@@ -167,11 +119,11 @@ const Post = ({ post }: any) => {
             <CardHeader
               avatar={
                 <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                  {posts[0].author.charAt(0).toUpperCase()}
+                  {post.author.charAt(0).toUpperCase()}
                 </Avatar>
               }
-              title={posts[0].author}
-              subheader={posts[0].created_at
+              title={post.author}
+              subheader={post.created_at
                 .split('.')[0]
                 .replace('T', ' ')
                 .substring(0, 16)}
@@ -179,16 +131,22 @@ const Post = ({ post }: any) => {
 
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                {posts[0].content}
+                {post.content}
               </Typography>
             </CardContent>
 
             <CardActions disableSpacing>
               <IconButton
                 aria-label="add to favorites"
-                onClick={() => likePost(posts[0].likes, posts[0].id)}
+                onClick={() => likePost(post.likes, post.id)}
               >
-                <Favorite /> <small id={`like${posts[0].id}`}>{posts[0].likes.usersLike.length}</small>
+                <Favorite className={`heart${post.id}`} />
+                <small className={`like${post.id}`}>{post.likes}</small>
+              </IconButton>
+
+              <IconButton aria-label="comment">
+                <Comment sx={{ marginRight: '3px' }}  />
+                <small>{post.comments.allComments.length}</small>
               </IconButton>
             </CardActions>
           </Card>
@@ -224,7 +182,7 @@ const Post = ({ post }: any) => {
             </Box>
           </form>
 
-          {posts[0].comments.allComments.map((comment: any) => (
+          {comments.map((comment: any) => (
             <Card sx={{ mt: 1, mb: 1 }} key={comment.id}>
               <CardHeader
                 avatar={
@@ -244,18 +202,18 @@ const Post = ({ post }: any) => {
             </Card>
           ))}
         </Container>
-      </ThemeProvider>
+      </Theme>
     </>
   );
 };
 
 export async function getServerSideProps({ query }: any) {
   const { id } = query;
-  const { data } = await supabase.from('posts').select('*').eq('id', id);
+  const { data }: any = await supabase.from('posts').select('*').eq('id', id);
 
   return {
     props: {
-      post: data,
+      post: data[0],
     },
   };
 }
