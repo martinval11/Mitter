@@ -18,3 +18,9 @@ body {
   text-decoration: none;
   color: inherit;
 }
+
+@media screen and (max-width: 730px) {
+  #flexColumn {
+    flex-direction: column;
+  }    
+}

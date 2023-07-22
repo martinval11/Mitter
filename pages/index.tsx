@@ -115,7 +115,7 @@ const Index = () => {
             </Grid>
           </Grid>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }} id="flexColumn">
             <Image src="/img/safe.svg" alt="Safe SVG Image" width={350} height={350} />
             <div>
               <Typography variant="h5">Your information is <b>yours</b></Typography>
