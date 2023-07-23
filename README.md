@@ -16,3 +16,4 @@ $ pnpm install
 * `pnpm dev` - Executes a dev environment.
 * `pnpm build` - Make a build for production.
 * `pnpm test` - Executes jest and testing library for test the components.
+* `pnpm e2e` - Executes cypress for testing.
