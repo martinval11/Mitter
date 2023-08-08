@@ -1,6 +1,7 @@
 # Mitter
 A Social Media without tracking
 
+## This project is no longer maintained. This is too big and overwhelming for me.
 **Warning:** This project is experimental and unstable.
 
 ## Setup
